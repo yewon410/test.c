@@ -1,3 +1,4 @@
+```c
 #include <stdio.h>
 #include <string.h>
 #include <ctype.h>
@@ -47,9 +48,15 @@ int main(void)
 
     for (int i = 0; input[i] != '\0'; i++) {
         if (!isspace((unsigned char)input[i])) {
+            if (length >= MAX_INPUT - 1) {
+                printf("오류: 입력 문자열이 너무 깁니다.\n");
+                return 1;
+            }
+
             tree[length++] = input[i];
         }
     }
+
     tree[length] = '\0';
 
     if (length == 0 || tree[0] != 'A') {
@@ -71,10 +78,16 @@ int main(void)
                 break;
             }
 
+            if (ch != 'A' + totalNodes) {
+                valid = 0;
+                break;
+            }
+
             used[ch - 'A'] = 1;
             totalNodes++;
 
             int depth = top + 1;
+
             if (depth > height) {
                 height = depth;
             }
@@ -88,16 +101,21 @@ int main(void)
 
                 if (nodeStack[top] == 'C') {
                     int position = counterStack[top] - 1;
-                    childrenOfC[position] = ch;
-                    childCountOfC = counterStack[top];
+
+                    if (position < MAX_NODES) {
+                        childrenOfC[position] = ch;
+                        childCountOfC = counterStack[top];
+                    }
                 }
             }
 
             expectNode = 0;
         }
         else if (ch == '(') {
-            if (expectNode || i == 0 ||
-                tree[i - 1] < 'A' || tree[i - 1] > 'Z' ||
+            if (expectNode ||
+                i == 0 ||
+                tree[i - 1] < 'A' ||
+                tree[i - 1] > 'Z' ||
                 top + 1 >= MAX_NODES) {
                 valid = 0;
                 break;
@@ -151,8 +169,8 @@ int main(void)
 
     if (!valid) {
         printf("오류: 올바른 트리의 괄호 표기법이 아닙니다.\n");
-        printf("괄호와 쉼표의 위치를 확인하고, "
-               "노드는 A부터 연속된 대문자를 중복 없이 사용하세요.\n");
+        printf("루트는 A이며, 노드는 A부터 알파벳 순서대로 중복 없이 사용해야 합니다.\n");
+        printf("괄호와 쉼표의 위치를 확인하세요.\n");
         return 1;
     }
 
@@ -168,6 +186,7 @@ int main(void)
     }
     else {
         printf("노드 C의 부모 노드: ");
+
         if (parentOfC != '\0') {
             printf("%c\n", parentOfC);
         }
@@ -176,6 +195,7 @@ int main(void)
         }
 
         printf("노드 C의 자식 노드: ");
+
         if (childCountOfC == 0) {
             printf("없음\n");
         }
@@ -184,8 +204,10 @@ int main(void)
                 if (i > 0) {
                     printf(", ");
                 }
+
                 printf("%c", childrenOfC[i]);
             }
+
             printf("\n");
         }
     }
@@ -211,6 +233,7 @@ int main(void)
                 for (int j = 1; j < depth; j++) {
                     printf("    ");
                 }
+
                 printf("+---%c\n", ch);
             }
         }
@@ -218,4 +241,4 @@ int main(void)
 
     return 0;
 }
-
+```
